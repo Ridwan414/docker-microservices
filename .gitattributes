@@ -1,0 +1,11 @@
+# Force LF line endings on shell scripts and Dockerfiles so Windows
+# contributors can't accidentally introduce CRLF, which breaks the
+# postgres entrypoint script mounted into the prod container
+# (see docker-compose.prod.yml, ./postgres-init.sh bind mount).
+
+*.sh      text eol=lf
+*.bash    text eol=lf
+Dockerfile text eol=lf
+
+# Let everything else use the platform default (CRLF on Windows, LF on Mac/Linux).
+* text=auto

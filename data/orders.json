@@ -1,0 +1,43 @@
+[
+  {
+    "user_email": "alice@example.com",
+    "items": [
+      { "name": "Mechanical Keyboard", "quantity": 1 },
+      { "name": "Wireless Mouse", "quantity": 1 }
+    ],
+    "shipping_address": {
+      "line1": "742 Evergreen Terrace",
+      "city": "Springfield",
+      "state": "OR",
+      "postal_code": "97477",
+      "country": "USA"
+    }
+  },
+  {
+    "user_email": "bob@example.com",
+    "items": [
+      { "name": "Pour-Over Coffee Dripper", "quantity": 1 },
+      { "name": "Leather Notebook", "quantity": 2 }
+    ],
+    "shipping_address": {
+      "line1": "221B Baker Street",
+      "city": "London",
+      "state": "GL",
+      "postal_code": "NW1 6XE",
+      "country": "UK"
+    }
+  },
+  {
+    "user_email": "alice@example.com",
+    "items": [
+      { "name": "Cotton Crew Neck T-Shirt", "quantity": 3 }
+    ],
+    "shipping_address": {
+      "line1": "742 Evergreen Terrace",
+      "city": "Springfield",
+      "state": "OR",
+      "postal_code": "97477",
+      "country": "USA"
+    }
+  }
+]

@@ -93,6 +93,23 @@ services:
       timeout: 5s
       retries: 5
 
+  # React SPA. Nginx inside the container serves the static bundle and
+  # reverse-proxies /api/<service>/... to the matching FastAPI container.
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - user-service
+      - product-service
+      - inventory-service
+      - order-service
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
 volumes:
   postgres_data:
   mongo_data:

@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Mechanical Keyboard",
+    "description": "75% layout, hot-swappable switches, RGB backlight, USB-C.",
+    "category": "Electronics",
+    "price": 129.99,
+    "quantity": 25
+  },
+  {
+    "name": "Noise-Cancelling Headphones",
+    "description": "Over-ear wireless headphones with active noise cancellation and 30h battery life.",
+    "category": "Electronics",
+    "price": 249.50,
+    "quantity": 15
+  },
+  {
+    "name": "Stainless Steel Water Bottle",
+    "description": "1L double-wall vacuum insulated, keeps drinks cold for 24h or hot for 12h.",
+    "category": "Home",
+    "price": 24.00,
+    "quantity": 100
+  },
+  {
+    "name": "Cotton Crew Neck T-Shirt",
+    "description": "Premium 180gsm cotton, pre-shrunk, available in multiple colors.",
+    "category": "Apparel",
+    "price": 19.99,
+    "quantity": 200
+  },
+  {
+    "name": "Leather Notebook",
+    "description": "A5 hardcover notebook with 200 dotted pages and a built-in bookmark.",
+    "category": "Stationery",
+    "price": 18.50,
+    "quantity": 60
+  },
+  {
+    "name": "Pour-Over Coffee Dripper",
+    "description": "Ceramic dripper for V60-style pour-over coffee. Single-cup size.",
+    "category": "Home",
+    "price": 22.75,
+    "quantity": 40
+  },
+  {
+    "name": "Running Shoes - Trail",
+    "description": "Lightweight trail running shoes with aggressive lugs and rock plate.",
+    "category": "Apparel",
+    "price": 89.95,
+    "quantity": 30
+  },
+  {
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with high-precision sensor and USB-C charging.",
+    "category": "Electronics",
+    "price": 39.00,
+    "quantity": 3
+  }
+]

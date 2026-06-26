@@ -1,0 +1,33 @@
+# ---- OS / editor noise ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+*.iml
+
+# ---- Secrets / env ----
+.env
+.env.local
+*.pem
+*.key
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Docker ----
+# (none today; uncomment if you start mounting volumes into the repo)
+# docker-data/
+
+# ---- Frontend: node + build artifacts ----
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ---- Playwright ----
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/

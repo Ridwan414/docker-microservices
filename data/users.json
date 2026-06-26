@@ -1,0 +1,40 @@
+[
+  {
+    "email": "alice@example.com",
+    "password": "password123",
+    "first_name": "Alice",
+    "last_name": "Anderson",
+    "phone": "+1-555-0101",
+    "address": {
+      "line1": "742 Evergreen Terrace",
+      "city": "Springfield",
+      "state": "OR",
+      "postal_code": "97477",
+      "country": "USA",
+      "is_default": true
+    }
+  },
+  {
+    "email": "bob@example.com",
+    "password": "password123",
+    "first_name": "Bob",
+    "last_name": "Brown",
+    "phone": "+1-555-0102",
+    "address": {
+      "line1": "221B Baker Street",
+      "city": "London",
+      "state": "GL",
+      "postal_code": "NW1 6XE",
+      "country": "UK",
+      "is_default": true
+    }
+  },
+  {
+    "email": "carol@example.com",
+    "password": "password123",
+    "first_name": "Carol",
+    "last_name": "Chen",
+    "phone": null,
+    "address": null
+  }
+]

@@ -84,6 +84,10 @@ async function request(method, path, { body, auth = true, retry = true, headers 
     serializedBody = body;
   } else if (body instanceof FormData) {
     serializedBody = body;
+  } else if (body instanceof URLSearchParams) {
+    // OAuth2 password flow sends form-encoded data. Pass it through as-is
+    // and respect any Content-Type the caller has already set.
+    serializedBody = body;
   } else {
     if (!reqHeaders['Content-Type']) reqHeaders['Content-Type'] = 'application/json';
     serializedBody = JSON.stringify(body);

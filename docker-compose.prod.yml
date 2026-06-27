@@ -97,11 +97,14 @@ services:
       - source: postgres_init
         target: /docker-entrypoint-initdb.d/init.sh
         mode: 0755
+    # Postgres first start also runs the inlined init script which creates
+    # two databases; give it a 20s start_period before healthchecks count.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
     restart: unless-stopped
 
   mongo:
@@ -110,11 +113,15 @@ services:
       - "27017"
     volumes:
       - mongo_data:/data/db
+    # MongoDB first start can take 30-60s (WiredTiger init, index build,
+    # Windows/WSL2 adds more). 30s start_period gives it a free pass before
+    # healthchecks start counting; 10 retries × 10s = ~100s tail grace.
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
 
   frontend:

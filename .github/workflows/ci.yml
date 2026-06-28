@@ -31,23 +31,18 @@ jobs:
           filters: |
             user:
               - 'user-service/**'
-              - 'docker-compose*.yml'
               - '.github/workflows/ci.yml'
             product:
               - 'product-service/**'
-              - 'docker-compose*.yml'
               - '.github/workflows/ci.yml'
             inventory:
               - 'inventory-service/**'
-              - 'docker-compose*.yml'
               - '.github/workflows/ci.yml'
             order:
               - 'order-service/**'
-              - 'docker-compose*.yml'
               - '.github/workflows/ci.yml'
             frontend:
               - 'frontend/**'
-              - 'docker-compose*.yml'
               - '.github/workflows/ci.yml'
 
   # ------------------------------------------------------------------

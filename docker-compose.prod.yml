@@ -1,17 +1,15 @@
 # Production compose file — zero-config.
 #
 # Every application service pulls its image from Docker Hub under
-# asifmahmoud414/docker-microservices-<service>:<tag>. Pinned to v0.0.1
-# (the GitHub Actions run that produced them). Infrastructure (postgres,
-# mongo) uses the official upstream images.
+# <DOCKERHUB_USERNAME>/docker-microservices-<service>:latest (pushed by
+# the CI pipeline). Infrastructure (postgres, mongo) uses the official
+# upstream images.
 #
 # No .env file, no exported variables, no build step on the host.
 # Share this single file and run:
 #
+#   docker compose -f docker-compose.prod.yml pull
 #   docker compose -f docker-compose.prod.yml up -d
-#
-# Bump the tag for one service if needed:
-#   sed -i 's/:v0.0.1/:v0.0.2/g' docker-compose.prod.yml
 #
 # Stop:
 #   docker compose -f docker-compose.prod.yml down         # keep volumes
@@ -19,7 +17,7 @@
 
 services:
   user-service:
-    image: asifmahmoud414/docker-microservices-user-service:v0.0.1
+    image: asifmahmoud414/docker-microservices-user-service:latest
     pull_policy: always
     ports:
       - "8010:8000"
@@ -35,7 +33,7 @@ services:
     restart: unless-stopped
 
   product-service:
-    image: asifmahmoud414/docker-microservices-product-service:v0.0.1
+    image: asifmahmoud414/docker-microservices-product-service:latest
     pull_policy: always
     ports:
       - "8001:8001"
@@ -51,7 +49,7 @@ services:
     restart: unless-stopped
 
   inventory-service:
-    image: asifmahmoud414/docker-microservices-inventory-service:v0.0.1
+    image: asifmahmoud414/docker-microservices-inventory-service:latest
     pull_policy: always
     ports:
       - "8002:8002"
@@ -125,7 +123,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: asifmahmoud414/docker-microservices-frontend:v0.0.1
+    image: asifmahmoud414/docker-microservices-frontend:latest
     pull_policy: always
     ports:
       - "3000:80"

@@ -143,3 +143,39 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/docker-microservices-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/docker-microservices-frontend:v0.0.${{ github.run_number }}
+
+  # ------------------------------------------------------------------
+  # Step 3: deploy to the server via SSH.
+  # Runs only if at least one service image was built and pushed.
+  # Pulls the latest code, then `docker compose up -d` to roll out
+  # the freshly-pushed images.
+  # ------------------------------------------------------------------
+  deploy:
+    needs:
+      - changes
+      - user-service
+      - product-service
+      - inventory-service
+      - order-service
+      - frontend
+    if: |
+      needs.changes.outputs.user      == 'true' ||
+      needs.changes.outputs.product   == 'true' ||
+      needs.changes.outputs.inventory == 'true' ||
+      needs.changes.outputs.order     == 'true' ||
+      needs.changes.outputs.frontend  == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:         ${{ secrets.DEPLOY_HOST }}
+          username:     ${{ secrets.DEPLOY_USER }}
+          key:          ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 10m
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH }} || exit 1
+            git pull --ff-only
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d

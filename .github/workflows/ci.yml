@@ -192,11 +192,17 @@ jobs:
             echo "token=GITHUB_TOKEN" >> "$GITHUB_OUTPUT"
             echo "BUMP_TOKEN not set, falling back to GITHUB_TOKEN"
           fi
-      - name: Checkout
+      - name: Checkout (with BUMP_TOKEN if set)
+        if: steps.token.outputs.token == 'BUMP_TOKEN'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.BUMP_TOKEN }}
+      - name: Checkout (default token)
+        if: steps.token.outputs.token != 'BUMP_TOKEN'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Bump image tags in docker-compose.prod.yml
         env:

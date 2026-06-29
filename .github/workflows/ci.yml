@@ -220,8 +220,10 @@ jobs:
           bump() {
             local svc=$1
             local img="${{ secrets.DOCKERHUB_USERNAME }}/docker-microservices-${svc}"
-            # Replace any v0.0.<digits> tag for this service image, or :latest
-            sed -i -E "s|(${img}):(v0\\.0\\.[0-9]+|latest)|\\1:${NEW_TAG}|g" "$FILE"
+            # Replace any v0.0.<digits> tag for this service image, or :latest.
+            # Use '#' as the sed delimiter because the alternative group below
+            # contains a '|' which would clash with the default '|' delimiter.
+            sed -i -E "s#(${img}):(v0\\.0\\.[0-9]+|latest)#\\1:${NEW_TAG}#g" "$FILE"
           }
 
           [ "$USER_FLAG"      = 'true' ] && bump user-service

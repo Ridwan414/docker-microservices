@@ -2,10 +2,24 @@ name: CI
 
 # Build & push a Docker image per service when its source changes.
 # Services: user, product, inventory, order, frontend.
+#
+# Flow:
+#   1. changes        - detect which service dirs (or compose files) changed
+#   2. <service>      - build & push the image to Docker Hub (:latest + v0.0.<run_number>)
+#   3. bump-tags      - rewrite docker-compose.prod.yml to pin v0.0.<run_number>
+#                       for each built service, commit & push back to main
+#   4. deploy         - SSH to server, git pull (picks up bumped tags), pull images, up -d
 
 on:
   push:
     branches: [main]
+
+# A self-hosted runner / fork situation: the default GITHUB_TOKEN is read-only
+# for cross-fork PR events. For self-push events on the fork's own main, it
+# can usually write, but to be safe we use a fine-grained PAT stored in
+# BUMP_TOKEN. Falls back to GITHUB_TOKEN if the secret is missing.
+permissions:
+  contents: write
 
 jobs:
   # ------------------------------------------------------------------
@@ -44,6 +58,9 @@ jobs:
             frontend:
               - 'frontend/**'
               - '.github/workflows/ci.yml'
+            changes:
+              - 'docker-compose.yml'
+              - 'docker-compose.prod.yml'
 
   # ------------------------------------------------------------------
   # Step 2: one job per service. Each runs only if its flag is true.
@@ -145,14 +162,101 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/docker-microservices-frontend:v0.0.${{ github.run_number }}
 
   # ------------------------------------------------------------------
-  # Step 3: deploy to the server via SSH.
-  # Runs only if at least one service image was built and pushed.
-  # Pulls the latest code, then `docker compose up -d` to roll out
-  # the freshly-pushed images.
+  # Step 3: rewrite docker-compose.prod.yml to pin the new run_number
+  # tag for each service that was rebuilt, then commit & push back to
+  # main. Deploy depends on this so it always sees the bumped tags
+  # when it runs `git pull` on the server.
+  #
+  # BUMP_TOKEN: a fine-grained PAT with `contents: write` on this repo.
+  # Falls back to GITHUB_TOKEN if BUMP_TOKEN is not set (works for
+  # non-fork repos; for forks the bump is silently skipped and deploy
+  # runs against the existing pinned tag, which is also safe).
+  # ------------------------------------------------------------------
+  bump-tags:
+    needs: changes
+    if: |
+      needs.changes.outputs.user      == 'true' ||
+      needs.changes.outputs.product   == 'true' ||
+      needs.changes.outputs.inventory == 'true' ||
+      needs.changes.outputs.order     == 'true' ||
+      needs.changes.outputs.frontend  == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine token
+        id: token
+        run: |
+          if [ -n "${{ secrets.BUMP_TOKEN }}" ]; then
+            echo "token=BUMP_TOKEN" >> "$GITHUB_OUTPUT"
+            echo "Using BUMP_TOKEN secret"
+          else
+            echo "token=GITHUB_TOKEN" >> "$GITHUB_OUTPUT"
+            echo "BUMP_TOKEN not set, falling back to GITHUB_TOKEN"
+          fi
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BUMP_TOKEN }}
+
+      - name: Bump image tags in docker-compose.prod.yml
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          USER_FLAG:      ${{ needs.changes.outputs.user }}
+          PRODUCT_FLAG:   ${{ needs.changes.outputs.product }}
+          INVENTORY_FLAG: ${{ needs.changes.outputs.inventory }}
+          ORDER_FLAG:     ${{ needs.changes.outputs.order }}
+          FRONTEND_FLAG:  ${{ needs.changes.outputs.frontend }}
+        run: |
+          set -euo pipefail
+          NEW_TAG="v0.0.${RUN_NUMBER}"
+          FILE=docker-compose.prod.yml
+
+          bump() {
+            local svc=$1
+            local img="${{ secrets.DOCKERHUB_USERNAME }}/docker-microservices-${svc}"
+            # Replace any v0.0.<digits> tag for this service image, or :latest
+            sed -i -E "s|(${img}):(v0\\.0\\.[0-9]+|latest)|\\1:${NEW_TAG}|g" "$FILE"
+          }
+
+          [ "$USER_FLAG"      = 'true' ] && bump user-service
+          [ "$PRODUCT_FLAG"   = 'true' ] && bump product-service
+          [ "$INVENTORY_FLAG" = 'true' ] && bump inventory-service
+          [ "$ORDER_FLAG"     = 'true' ] && bump order-service
+          [ "$FRONTEND_FLAG"  = 'true' ] && bump frontend
+
+          echo "----- diff of $FILE -----"
+          git --no-pager diff -- "$FILE" || true
+          echo "--------------------------"
+
+          if git diff --quiet -- "$FILE"; then
+            echo "No changes to $FILE; nothing to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+        id: bump
+
+      - name: Commit and push bumped tags
+        if: steps.bump.outputs.changed == 'true'
+        run: |
+          TOKEN="${{ steps.token.outputs.token == 'BUMP_TOKEN' && secrets.BUMP_TOKEN || secrets.GITHUB_TOKEN }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docker-compose.prod.yml
+          git commit -m "ci: bump image tags to v0.0.${{ github.run_number }}"
+          # Use the chosen token via a temporary remote URL
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin HEAD:main
+
+  # ------------------------------------------------------------------
+  # Step 4: deploy to the server via SSH.
+  # Pulls the latest code (now with bumped tags), pulls the matching
+  # images, and starts the new containers.
   # ------------------------------------------------------------------
   deploy:
     needs:
       - changes
+      - bump-tags
       - user-service
       - product-service
       - inventory-service

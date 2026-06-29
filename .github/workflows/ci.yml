@@ -261,38 +261,38 @@ jobs:
   # Pulls the latest code (now with bumped tags), pulls the matching
   # images, and starts the new containers.
   # ------------------------------------------------------------------
-  # deploy:
-  #   needs:
-  #     - changes
-  #     - bump-tags
-  #     - user-service
-  #     - product-service
-  #     - inventory-service
-  #     - order-service
-  #     - frontend
-  #   if: |
-  #     needs.changes.outputs.user      == 'true' ||
-  #     needs.changes.outputs.product   == 'true' ||
-  #     needs.changes.outputs.inventory == 'true' ||
-  #     needs.changes.outputs.order     == 'true' ||
-  #     needs.changes.outputs.frontend  == 'true'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Setup SSH key
-  #       run: |
-  #         mkdir -p ~/.ssh
-  #         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
-  #         chmod 600 ~/.ssh/deploy_key
-  #         ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
-  #     - name: Deploy via SSH
-  #       run: |
-  #         ssh -i ~/.ssh/deploy_key \
-  #             -o StrictHostKeyChecking=yes \
-  #             -o ConnectTimeout=15 \
-  #             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} <<'EOF'
-  #         set -e
-  #         cd ${{ secrets.DEPLOY_PATH }} || exit 1
-  #         git pull --ff-only
-  #         docker compose -f docker-compose.prod.yml pull
-  #         docker compose -f docker-compose.prod.yml up -d
-  #         EOF
+  deploy:
+    needs:
+      - changes
+      - bump-tags
+      - user-service
+      - product-service
+      - inventory-service
+      - order-service
+      - frontend
+    if: |
+      needs.changes.outputs.user      == 'true' ||
+      needs.changes.outputs.product   == 'true' ||
+      needs.changes.outputs.inventory == 'true' ||
+      needs.changes.outputs.order     == 'true' ||
+      needs.changes.outputs.frontend  == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Deploy via SSH
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=yes \
+              -o ConnectTimeout=15 \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} <<'EOF'
+          set -e
+          cd ${{ secrets.DEPLOY_PATH }} || exit 1
+          git pull --ff-only
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d
+          EOF

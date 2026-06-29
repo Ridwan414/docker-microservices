@@ -126,7 +126,7 @@ services:
     image: asifmahmoud414/docker-microservices-frontend:latest
     pull_policy: always
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       - user-service
       - product-service

@@ -260,16 +260,19 @@ jobs:
   # Step 4: deploy to the server via SSH.
   # Pulls the latest code (now with bumped tags), pulls the matching
   # images, and starts the new containers.
+  #
+  # Why deploy only needs [changes, bump-tags] and NOT the per-service
+  # build jobs: jobs that are skipped because their `if:` is false are
+  # treated as FAILED by `needs:`, which would skip deploy too. Deploy
+  # doesn't actually depend on those jobs running — it pulls already-
+  # pushed images by tag from Docker Hub, and bump-tags has rewritten
+  # docker-compose.prod.yml to reference exactly those tags. So we
+  # just wait for the bump commit to land on main.
   # ------------------------------------------------------------------
   deploy:
     needs:
       - changes
       - bump-tags
-      - user-service
-      - product-service
-      - inventory-service
-      - order-service
-      - frontend
     if: |
       needs.changes.outputs.user      == 'true' ||
       needs.changes.outputs.product   == 'true' ||

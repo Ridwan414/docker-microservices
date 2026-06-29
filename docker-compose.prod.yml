@@ -123,7 +123,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: asifmahmoud414/docker-microservices-frontend:v0.0.14
+    image: asifmahmoud414/docker-microservices-frontend:v0.0.15
     pull_policy: always
     ports:
       - "80:80"

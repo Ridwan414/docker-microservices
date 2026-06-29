@@ -17,7 +17,7 @@
 
 services:
   user-service:
-    image: asifmahmoud414/docker-microservices-user-service:v0.0.13
+    image: asifmahmoud414/docker-microservices-user-service:v0.0.14
     pull_policy: always
     ports:
       - "8010:8000"
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
 
   product-service:
-    image: asifmahmoud414/docker-microservices-product-service:v0.0.13
+    image: asifmahmoud414/docker-microservices-product-service:v0.0.14
     pull_policy: always
     ports:
       - "8001:8001"
@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
 
   inventory-service:
-    image: asifmahmoud414/docker-microservices-inventory-service:v0.0.13
+    image: asifmahmoud414/docker-microservices-inventory-service:v0.0.14
     pull_policy: always
     ports:
       - "8002:8002"
@@ -61,7 +61,7 @@ services:
     restart: unless-stopped
 
   order-service:
-    image: asifmahmoud414/docker-microservices-order-service:v0.0.13
+    image: asifmahmoud414/docker-microservices-order-service:v0.0.14
     pull_policy: always
     ports:
       - "8003:8003"
@@ -123,7 +123,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: asifmahmoud414/docker-microservices-frontend:v0.0.13
+    image: asifmahmoud414/docker-microservices-frontend:v0.0.14
     pull_policy: always
     ports:
       - "80:80"
